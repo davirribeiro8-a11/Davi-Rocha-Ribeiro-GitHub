@@ -1,0 +1,265 @@
+
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="sm-user-cadastro-page">
+
+    <div class="sm-user-cadastro-container">
+
+        <div class="sm-user-cadastro-card">
+
+            <!-- CABEÇALHO -->
+            <div class="sm-user-cadastro-header">
+
+                <div class="sm-user-cadastro-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+
+                <div class="sm-user-cadastro-heading">
+
+                    <h2 class="sm-user-cadastro-title">
+                        {% if usuario and usuario.id %}Editar usuário{% else %}Novo usuário{% endif %}
+                    </h2>
+
+                    <p class="sm-user-cadastro-subtitle">
+                        Cadastre um novo usuário no SmartMeds.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORMULÁRIO -->
+            <form
+                method="POST"
+                class="sm-user-cadastro-form"
+                action="{% if usuario and usuario.id %}{{ url_for('atualizar_usuario', id=usuario.id) }}{% else %}{{ url_for('salvar_usuario') }}{% endif %}"
+                enctype="multipart/form-data"
+            >
+
+                <!-- FOTO -->
+                <div class="sm-user-cadastro-field text-center mb-3">
+
+                    <label
+                        for="sm-user-cadastro-foto"
+                        class="sm-user-cadastro-label d-block mb-2"
+                    >
+                        Foto de perfil
+                    </label>
+
+                    <input
+                        type="file"
+                        id="sm-user-cadastro-foto"
+                        name="foto"
+                        class="sm-user-cadastro-input"
+                        accept="image/*"
+                    >
+
+                </div>
+
+
+                <!-- NOME -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-nome"
+                        class="sm-user-cadastro-label"
+                    >
+                        Nome completo
+                    </label>
+
+                    <input
+                        type="text"
+                        id="sm-user-cadastro-nome"
+                        name="nome"
+                        class="sm-user-cadastro-input"
+                        placeholder="Digite o nome completo"
+                        value="{{ usuario.nome if usuario else '' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- IDENTIFICAÇÃO -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-identificacao"
+                        class="sm-user-cadastro-label"
+                    >
+                        Identificação
+                    </label>
+
+                    <input
+                        type="text"
+                        id="sm-user-cadastro-identificacao"
+                        name="identificacao"
+                        class="sm-user-cadastro-input"
+                        placeholder="Digite a identificação"
+                        value="{{ usuario.identificacao if usuario else '' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- E-MAIL -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-email"
+                        class="sm-user-cadastro-label"
+                    >
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="sm-user-cadastro-email"
+                        name="email"
+                        class="sm-user-cadastro-input"
+                        placeholder="Digite o e-mail"
+                        value="{{ usuario.email if usuario else '' }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CNPJ -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-cnpj"
+                        class="sm-user-cadastro-label"
+                    >
+                        CNPJ
+                    </label>
+
+                    <input
+                        type="text"
+                        id="sm-user-cadastro-cnpj"
+                        name="cnpj"
+                        class="sm-user-cadastro-input"
+                        placeholder="00.000.000/0000-00"
+                        maxlength="18"
+                    >
+
+                </div>
+
+
+                <!-- TIPO -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-tipo"
+                        class="sm-user-cadastro-label"
+                    >
+                        Tipo de usuário
+                    </label>
+
+                    <select
+                        id="sm-user-cadastro-tipo"
+                        name="tipo"
+                        class="sm-user-cadastro-select"
+                        required
+                    >
+
+                        <option value="">
+                            Selecione o tipo
+                        </option>
+
+                        <option value="adm" {% if usuario and usuario.tipo == 'adm' %}selected{% endif %}>
+                            Administrador
+                        </option>
+
+                        <option value="estoquista" {% if usuario and usuario.tipo == 'estoquista' %}selected{% endif %}>
+                            Estoquista
+                        </option>
+
+                        <option value="consulta" {% if usuario and usuario.tipo == 'consulta' %}selected{% endif %}>
+                            Consulta
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SENHA -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-senha"
+                        class="sm-user-cadastro-label"
+                    >
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="sm-user-cadastro-senha"
+                        name="senha"
+                        class="sm-user-cadastro-input"
+                        placeholder="{% if usuario and usuario.id %}Digite uma nova senha ou deixe em branco{% else %}Digite uma senha{% endif %}"
+                        {% if not usuario or not usuario.id %}required{% endif %}
+                    >
+
+                </div>
+
+
+                <!-- CONFIRMAR SENHA -->
+                <div class="sm-user-cadastro-field">
+
+                    <label
+                        for="sm-user-cadastro-confirmar-senha"
+                        class="sm-user-cadastro-label"
+                    >
+                        Confirmar senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="sm-user-cadastro-confirmar-senha"
+                        name="confirmar_senha"
+                        class="sm-user-cadastro-input"
+                        placeholder="Confirme a senha"
+                        {% if not usuario or not usuario.id %}required{% endif %}
+                    >
+
+                </div>
+
+
+                <!-- BOTÕES -->
+                <div class="sm-user-cadastro-actions">
+
+                    <a
+                        href="{{ url_for('listar_usuarios') }}"
+                        class="sm-user-cadastro-btn-back"
+                    >
+                        <i class="bi bi-arrow-left"></i>
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="sm-user-cadastro-btn-save"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        {% if usuario and usuario.id %}Salvar alterações{% else %}Cadastrar usuário{% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

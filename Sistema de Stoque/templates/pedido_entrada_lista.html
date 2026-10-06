@@ -1,0 +1,76 @@
+{% extends 'base.html' %} {% block conteudo %}
+
+<div class="container mt-4">
+    <!-- TÍTULO + BOTÕES -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Pedidos de Entrada</h4>
+        <div>
+            <a href="{{ url_for('novo_pedido_entrada') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- MENSAGENS -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'sucesso' else 'danger' }}">
+        {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <!-- TABELA -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {% if pedidos_entrada %}
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Documento</th>
+                        <th>Fornecedor</th>
+                        <th>Data Entrada</th>
+                        <th>Usuário</th>
+                        <th>Status</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for pedido in pedidos_entrada %}
+                    <tr>
+                        <td>{{ pedido.numero_documento }}</td>
+                        <td>{{ pedido.fornecedor }}</td>
+                        <td>{{ pedido.data_entrada }}</td>
+                        <td>{{ pedido.id_usuario }}</td>
+                        <td>{{ pedido.status }}</td>
+
+                        <td class="text-end">
+
+                            <a href="{{ url_for('buscar_pedido_entrada', id=pedido.id_pedido_entrada) }}"
+                                class="btn btn-sm btn-primary">
+                                Editar
+                            </a>
+
+                            <form action="{{ url_for('excluir_pedido_entrada', id=pedido.id_pedido_entrada) }}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este pedido?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                            </form>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <div class="text-center text-muted">
+                Nenhum pedido cadastrado.
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

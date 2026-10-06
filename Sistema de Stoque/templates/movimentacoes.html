@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO DA PÁGINA -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="titulo-pagina mb-1">Movimentações de Estoque</h2>
+            <p class="text-muted mb-0 small">Histórico de entradas, saídas e movimentações do sistema.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('novo_pedido_entrada') }}" class="btn btn-success">
+                <i class="bi bi-box-arrow-in-down me-1"></i> Nova Entrada
+            </a>
+            <a href="{{ url_for('novo_pedido_saida') }}" class="btn btn-danger">
+                <i class="bi bi-box-arrow-up me-1"></i> Nova Saída
+            </a>
+        </div>
+    </div>
+
+    <!-- CARD PRINCIPAL COM TABS DE NAVEGAÇÃO -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <ul class="nav nav-tabs card-header-tabs" id="movimentacoesTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active fw-semibold" id="todas-tab" data-bs-toggle="tab" data-bs-target="#todas">
+                        <i class="bi bi-list-task me-1"></i> Geral
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="entradas-tab" data-bs-toggle="tab" data-bs-target="#entradas">
+                        <i class="bi bi-arrow-down-left-circle text-success me-1"></i> Pedidos de Entrada
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="saidas-tab" data-bs-toggle="tab" data-bs-target="#saidas">
+                        <i class="bi bi-arrow-up-right-circle text-danger me-1"></i> Pedidos de Saída
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-4">
+            <div class="tab-content" id="movimentacoesTabContent">
+
+                <!-- TAB 1: TODAS AS MOVIMENTAÇÕES DE PRODUTOS -->
+                <div class="tab-pane fade show active" id="todas" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Produto</th>
+                                    <th>Tipo</th>
+                                    <th>Quantidade</th>
+                                    <th>Data / Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if movimentacoes %}
+                                    {% for m in movimentacoes %}
+                                    <tr>
+                                        <td><strong>#{{ m.id }}</strong></td>
+                                        <td>{{ m.produto }}</td>
+                                        <td>
+                                            {% if (m.tipo_movimentacao or '').upper() == 'ENTRADA' %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">ENTRADA</span>
+                                            {% elif (m.tipo_movimentacao or '').upper() == 'SAIDA' %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">SAÍDA</span>
+                                            {% else %}
+                                                <span class="badge bg-info-subtle text-info border border-info-subtle">{{ m.tipo_movimentacao }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>{{ m.quantidade }}</strong> un</td>
+                                        <td>{{ m.data_movimentacao }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Nenhuma movimentação registrada.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 2: HISTÓRICO DE ENTRADAS -->
+                <div class="tab-pane fade" id="entradas" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Fornecedor</th>
+                                    <th>Data Entrada</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if movimentacoes_entrada %}
+                                    {% for e in movimentacoes_entrada %}
+                                    <tr>
+                                        <td><strong>{{ e.numero_documento or e.id or 'N/A' }}</strong></td>
+                                        <td>{{ e.fornecedor or 'N/A' }}</td>
+                                        <td>{{ e.data_entrada }}</td>
+                                        <td><span class="badge bg-success">{{ e.status or 'Aberto' }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Nenhum pedido de entrada cadastrado.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: HISTÓRICO DE SAÍDAS -->
+                <div class="tab-pane fade" id="saidas" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo</th>
+                                    <th>Pagamento</th>
+                                    <th>Data Pagamento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if movimentacoes_saida %}
+                                    {% for s in movimentacoes_saida %}
+                                    <tr>
+                                        <td><strong>#{{ s.id }}</strong></td>
+                                        <td>{{ s.tipo or 'Saída' }}</td>
+                                        <td>{{ s.pagamento or 'N/A' }}</td>
+                                        <td>{{ s.data_pagamento or 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Nenhum pedido de saída cadastrado.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

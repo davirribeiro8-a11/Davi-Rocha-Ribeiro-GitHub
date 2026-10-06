@@ -1,0 +1,116 @@
+{% extends 'base.html' %} {% block conteudo %}
+
+<div class="gradient">
+  <div class="container login-container">
+    <div class="login-card">
+      <!-- LADO DA IMAGEM -->
+      <div class="left-side">
+        <div class="left-text">
+          <h2>SmartMeds</h2>
+          <p>
+            Gerencie seu estoque de medicamentos de forma moderna, rápida e
+            inteligente.
+          </p>
+        </div>
+      </div>
+      <!-- LADO DO FORMULÁRIO -->
+      <div class="right-side">
+        <div class="top-form">
+          <h3>{% if cliente %} Cadastrar Cliente {% endif %}</h3>
+          <p>Preencha as informações abaixo</p>
+        </div>
+        <form
+          method="POST"
+          action="{% if cliente and cliente.id %}
+                                {{ url_for('atualizar_cliente', id=cliente.id) }}
+                              {% else %}
+                                {{ url_for('salvar_cliente') }}
+                              {% endif %}"
+        >
+          <!-- NOME -->
+          <div class="input-group-custom">
+            <label class="form-label fw-semibold"> Nome completo </label>
+            <input
+              type="text"
+              name="nome"
+              class="form-control"
+              placeholder="Digite seu nome..."
+              value="{{ cliente.nome if cliente else '' }}"
+              required
+            />
+          </div>
+
+          <!-- SENHA -->
+          <div class="input-group-custom">
+            <label class="form-label fw-semibold">Senha</label>
+            <input
+              type="password"
+              name="senha"
+              class="form-control"
+              placeholder="Digite sua senha..."
+              required
+            />
+          </div>
+
+          <!-- CONFIRMAR SENHA -->
+          <div class="input-group-custom">
+             <label class="form-label fw-semibold">Confirmar Senha</label>
+            <input
+              type="password"
+              name="confirmar_senha"
+              class="form-control"
+              placeholder="Confirme a senha..."
+              required
+            />
+          </div>
+
+          <!-- EMAIL -->
+          <div class="input-group-custom">
+            <label class="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              placeholder="Digite seu email..."
+              value="{{ cliente.email if cliente else '' }}"
+              required
+            />
+          </div>
+
+          <!-- CNPJ -->
+          <div class="input-group-custom">
+            <label class="form-label fw-semibold">CNPJ</label>
+            <input
+              type="text"
+              name="cnpj"
+              id="cnpj"
+              class="form-control custom-input"
+              placeholder="Digite o CNPJ..."
+              value="{{ cliente.cnpj if cliente else '' }}"
+              required
+            />
+          </div>
+
+          <!-- BOTÃO -->
+          <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                {% if cliente %} Atualizar Cliente {% else %} Cadastrar Cliente
+                {% endif %}
+              </button>
+              <a
+                href="{{ url_for('listar_clientes') }}"
+                class="btn btn-outline-secondary"
+              >
+                Voltar
+              </a>
+            </div>
+          </form>
+
+        <!-- FOOTER -->
+        <div class="footer-login">© 2026 Senai • Sistema SmartMeds</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+
+
+{% macro alerta_item(icone, cor, titulo, subtitulo, badge_texto, produto_id=None, detalhes=None) %}
+<div class="notification-item notification-item--{{ cor }} p-3 mb-2 d-flex justify-content-between align-items-center gap-2"
+     data-bs-toggle="modal"
+     data-bs-target="#modalDetalheAlerta"
+     data-icone="{{ icone }}"
+     data-cor="{{ cor }}"
+     data-titulo="{{ titulo }}"
+     data-badge="{{ badge_texto }}"
+     data-detalhes='{{ (detalhes or []) | tojson }}'
+     data-produto-url="{{ url_for('buscar_produto', id=produto_id) if produto_id else '' }}">
+    <div class="d-flex align-items-center gap-3">
+        <div class="notif-icon notif-icon--{{ cor }}">
+            <i class="bi {{ icone }}"></i>
+        </div>
+        <div>
+            <strong class="d-block text-dark">{{ titulo }}</strong>
+            <small class="text-muted">{{ subtitulo|safe }}</small>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <span class="badge notif-badge--{{ cor }} rounded-pill">{{ badge_texto }}</span>
+        {% if produto_id %}
+        <a href="{{ url_for('buscar_produto', id=produto_id) }}" class="btn btn-sm btn-white border shadow-2xs rounded-circle p-1" title="Ajustar" onclick="event.stopPropagation();">
+            <i class="bi bi-pencil-short fs-6"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+<div class="container-fluid py-2">
+
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h4 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard Operacional
+            </h4>
+            <p class="text-muted small mb-0">Gestão centralizada de estoque, movimentações e cadeia de frio</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill fw-semibold shadow-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i> Sincronizar
+        </a>
+    </div>
+
+    <!-- CARDS DE INDICADORES (GRID RESPONSIVO E EQUILIBRADO) -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3 mb-4">
+
+        <div class="col">
+            <div class="dash-card card h-100 border-0 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-primary-subtle text-primary">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Total Produtos</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ total_produtos or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="dash-card card h-100 border-0 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-danger-subtle text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Estoque Baixo</span>
+                        <h3 class="fw-bold mb-0 text-danger">{{ produtos_baixo|length if produtos_baixo else 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="dash-card card h-100 border-0 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-warning-subtle text-warning-emphasis">
+                        <i class="bi bi-calendar-x-fill"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Vencendo (30d)</span>
+                        <h3 class="fw-bold mb-0 text-warning-emphasis">{{ produtos_vencendo|length if produtos_vencendo else 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="dash-card card h-100 border-0 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-success-subtle text-success">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Movimentações</span>
+                        <h3 class="fw-bold mb-0 text-dark">{{ total_movimentacoes or 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="dash-card card h-100 border-0 p-3">
+                {% set alertas_temp_count = alertas_temperatura|length if alertas_temperatura else 0 %}
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape {{ 'bg-danger-subtle text-danger' if alertas_temp_count > 0 else 'bg-info-subtle text-info-emphasis' }}">
+                        <i class="bi bi-thermometer-half"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Alertas Temp.</span>
+                        <h3 class="fw-bold mb-0 {{ 'text-danger' if alertas_temp_count > 0 else 'text-dark' }}">
+                            {{ alertas_temp_count }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GERENCIAMENTO DE TEMPERATURA E CADEIA DE FRIO -->
+    <div class="dash-card card border-0 mb-4">
+        <div class="card-header bg-transparent border-0 pt-3 px-4 pb-2 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-thermometer-snow text-primary fs-5"></i>
+                <h6 class="fw-bold mb-0 text-dark">Monitoramento da Cadeia de Frio</h6>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="status-dot status-dot-active"></span>
+                <span class="small text-muted fw-semibold" style="font-size: 0.78rem;">Sensores Ativos</span>
+            </div>
+        </div>
+        <div class="card-body px-4 pb-4 pt-1">
+            <div class="row g-3">
+                {% for sensor in sensores_temperatura %}
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="sensor-card p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-dark text-truncate" style="max-width: 140px;" title="{{ sensor.nome }}">
+                                {{ sensor.nome }}
+                            </span>
+                            {% if sensor.status == 'critico' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Crítico</span>
+                            {% elif sensor.status == 'atencao' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill">Atenção</span>
+                            {% else %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Ideal</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-2 my-1">
+                            <h2 class="fw-bold mb-0 {{ 'text-danger' if sensor.status != 'normal' else 'text-dark' }}">
+                                {{ "%.1f"|format(sensor.temperatura) }}°<span class="fs-5">C</span>
+                            </h2>
+                            <span class="text-muted small">
+                                Faixa: {{ sensor.temp_min }}°C a {{ sensor.temp_max }}°C
+                            </span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted" style="font-size: 0.78rem;">
+                            <span><i class="bi bi-clock me-1"></i>{{ sensor.ultima_leitura or 'Agora' }}</span>
+                            <span><i class="bi bi-box-seam me-1"></i>{{ sensor.produtos_armazenados or 0 }} itens</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="bi bi-thermometer-sun fs-2 text-secondary mb-2 d-block"></i>
+                    <p class="mb-0 fw-semibold text-secondary">Nenhum sensor de temperatura registrado.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- DADOS OCULTOS PARA GRÁFICOS -->
+    <div id="dadosDashboard"
+         data-labels='{{ labels_estoque | tojson }}'
+         data-quantidades='{{ quantidades_estoque | tojson }}'
+         data-entradas='{{ entradas or 0 }}'
+         data-saidas='{{ saidas or 0 }}'>
+    </div>
+
+    <!-- GRÁFICOS OPERACIONAIS -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="dash-card card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pt-3 px-4 pb-0">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Níveis de Estoque por Produto</h6>
+                </div>
+                <div class="card-body px-4 pb-3">
+                    <canvas id="graficoEstoque" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="dash-card card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pt-3 px-4 pb-0">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Balanço de Movimentações</h6>
+                </div>
+                <div class="card-body px-4 pb-3 d-flex align-items-center justify-content-center">
+                    <canvas id="graficoMovimentacao" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELAS E PAINEL DE NOTIFICAÇÕES -->
+    <div class="row g-3">
+
+        <!-- ÚLTIMAS MOVIMENTAÇÕES -->
+        <div class="col-12 col-lg-7">
+            <div class="dash-card card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pt-3 px-4 pb-2 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Últimas Movimentações</h6>
+                    <a href="{{ url_for('movimentacoes') }}" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold">Ver histórico completo &rarr;</a>
+                </div>
+                <div class="table-responsive px-3 pb-3">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="border-0 rounded-start">Produto</th>
+                                <th class="border-0">Tipo</th>
+                                <th class="border-0">Qtd.</th>
+                                <th class="border-0 rounded-end">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top-0">
+                            {% for m in movimentacoes_recentes %}
+                            <tr>
+                                <td class="fw-semibold text-dark">{{ m.produto_nome or m.produto or 'Produto Desconhecido' }}</td>
+                                <td>
+                                    {% if (m.tipo_movimentacao or '')|upper == 'ENTRADA' %}
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1">Entrada</span>
+                                    {% elif (m.tipo_movimentacao or '')|upper == 'SAIDA' %}
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1">Saída</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2 py-1">{{ m.tipo_movimentacao or 'Registro' }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold text-dark">{{ m.quantidade or 0 }}</td>
+                                <td class="text-muted small">{{ m.data_movimentacao or '-' }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Nenhuma movimentação recente registrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTRAL DE NOTIFICAÇÕES -->
+        <div class="col-12 col-lg-5">
+            <div class="dash-card card border-0 h-100">
+                <div class="card-header bg-transparent border-0 pt-3 px-4 pb-2 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-bell-fill text-warning fs-5"></i>
+                        <h6 class="fw-bold mb-0 text-dark">Central de Alertas</h6>
+                    </div>
+                    {% set total_alertas = (produtos_baixo|length if produtos_baixo else 0) + (produtos_vencendo|length if produtos_vencendo else 0) + (alertas_temperatura|length if alertas_temperatura else 0) %}
+                    <span class="badge {{ 'bg-danger text-white' if total_alertas > 0 else 'bg-secondary-subtle text-secondary' }} rounded-pill px-2 py-1">
+                        {{ total_alertas }} {{ 'pendência' if total_alertas == 1 else 'pendências' }}
+                    </span>
+                </div>
+                <div class="card-body px-4 pt-2 pb-3 notif-scroll">
+
+                    {% if alertas_temperatura %}
+                    <div class="notif-group-label">Temperatura</div>
+                    {% for sensor in alertas_temperatura %}
+                        {{ alerta_item(
+                            'bi-thermometer-high', 'danger',
+                            sensor.nome,
+                            'Leitura: <strong class="text-danger">' ~ "%.1f"|format(sensor.temperatura) ~ '°C</strong> (Ideal: ' ~ sensor.temp_min ~ '°C - ' ~ sensor.temp_max ~ '°C)',
+                            'Temp. Fora',
+                            None,
+                            [
+                                {'label': 'Leitura atual', 'valor': "%.1f"|format(sensor.temperatura) ~ '°C'},
+                                {'label': 'Faixa ideal', 'valor': (sensor.temp_min ~ '°C a ' ~ sensor.temp_max ~ '°C')},
+                                {'label': 'Última leitura', 'valor': (sensor.ultima_leitura or 'Agora')},
+                                {'label': 'Produtos armazenados', 'valor': ((sensor.produtos_armazenados or 0) ~ ' itens')}
+                            ]
+                        ) }}
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if produtos_baixo %}
+                    <div class="notif-group-label">Estoque</div>
+                    {% for p in produtos_baixo %}
+                        {{ alerta_item(
+                            'bi-exclamation-circle-fill', 'danger',
+                            p.nome,
+                            'Disponível: <strong class="text-dark">' ~ (p.quantidade or 0) ~ ' ' ~ (p.unidade_medida or 'un') ~ '</strong>',
+                            'Estoque Baixo', p.id,
+                            [
+                                {'label': 'Quantidade disponível', 'valor': ((p.quantidade or 0) ~ ' ' ~ (p.unidade_medida or 'un'))},
+                                {'label': 'Estoque mínimo', 'valor': ((p.estoque_minimo or '-') ~ ' ' ~ (p.unidade_medida or 'un'))},
+                                {'label': 'Categoria', 'valor': (p.categoria or '-')},
+                                {'label': 'Fornecedor', 'valor': (p.fornecedor or '-')}
+                            ]
+                        ) }}
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if produtos_vencendo %}
+                    <div class="notif-group-label">Validade</div>
+                    {% for p in produtos_vencendo %}
+                        {{ alerta_item(
+                            'bi-clock-fill', 'warning',
+                            p.nome,
+                            'Vencimento: <strong class="text-dark">' ~ p.data_de_validade ~ '</strong>',
+                            'Validade', p.id,
+                            [
+                                {'label': 'Data de vencimento', 'valor': (p.data_de_validade or '-')},
+                                {'label': 'Quantidade em estoque', 'valor': ((p.quantidade or 0) ~ ' ' ~ (p.unidade_medida or 'un'))},
+                                {'label': 'Lote', 'valor': (p.lote or '-')},
+                                {'label': 'Categoria', 'valor': (p.categoria or '-')}
+                            ]
+                        ) }}
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if not produtos_baixo and not produtos_vencendo and not alertas_temperatura %}
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-shield-check text-success display-6 mb-2 d-block"></i>
+                        <p class="mb-0 fw-semibold text-dark">Operação Normal</p>
+                        <small class="text-muted">Nenhum desvio de estoque ou temperatura identificado.</small>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL DE DETALHES DA NOTIFICAÇÃO -->
+<div class="modal fade" id="modalDetalheAlerta" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body pt-0 px-4 pb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div id="modalAlertaIcone" class="notif-modal-icon">
+                        <i class="bi" id="modalAlertaIconeBi"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-dark" id="modalAlertaTitulo">-</h5>
+                        <span class="badge rounded-pill" id="modalAlertaBadge">-</span>
+                    </div>
+                </div>
+                <div id="modalAlertaDetalhes"></div>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Fechar</button>
+                    <a href="#" id="modalAlertaAjustarLink" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="bi bi-pencil-short me-1"></i> Ajustar produto
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CHART JS & RENDERIZAÇÃO -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const dados = document.getElementById("dadosDashboard");
+    if (!dados) return;
+
+    const labels = JSON.parse(dados.dataset.labels || "[]");
+    const quantidades = JSON.parse(dados.dataset.quantidades || "[]");
+    const entradas = parseInt(dados.dataset.entradas || 0);
+    const saidas = parseInt(dados.dataset.saidas || 0);
+
+    // GRÁFICO ESTOQUE
+    const ctx1 = document.getElementById("graficoEstoque");
+    if (ctx1) {
+        new Chart(ctx1, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Quantidade em Estoque",
+                    data: quantidades,
+                    backgroundColor: "#3b82f6",
+                    hoverBackgroundColor: "#2563eb",
+                    borderRadius: 8,
+                    maxBarThickness: 32
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: "rgba(0, 0, 0, 0.04)" },
+                        ticks: { font: { size: 11 } }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // GRÁFICO MOVIMENTAÇÃO
+    const ctx2 = document.getElementById("graficoMovimentacao");
+    if (ctx2) {
+        new Chart(ctx2, {
+            type: "doughnut",
+            data: {
+                labels: ["Entradas", "Saídas"],
+                datasets: [{
+                    data: [entradas, saidas],
+                    backgroundColor: ["#10b981", "#ef4444"],
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        position: "bottom",
+                        labels: { font: { size: 12 }, usePointStyle: true, boxWidth: 8 }
+                    } 
+                },
+                cutout: "75%"
+            }
+        });
+    }
+
+});
+
+// POPUP DE DETALHES DA NOTIFICAÇÃO
+document.addEventListener("DOMContentLoaded", function () {
+    const modalEl = document.getElementById("modalDetalheAlerta");
+    if (!modalEl) return;
+
+    modalEl.addEventListener("show.bs.modal", function (event) {
+        const item = event.relatedTarget;
+        if (!item) return;
+
+        const cor = item.dataset.cor || "danger";
+        const icone = item.dataset.icone || "bi-info-circle-fill";
+        const titulo = item.dataset.titulo || "-";
+        const badge = item.dataset.badge || "-";
+        const produtoUrl = item.dataset.produtoUrl || "";
+        let detalhes = [];
+        try {
+            detalhes = JSON.parse(item.dataset.detalhes || "[]");
+        } catch (e) {
+            detalhes = [];
+        }
+
+        const iconeBox = document.getElementById("modalAlertaIcone");
+        iconeBox.className = "notif-modal-icon notif-modal-icon--" + cor;
+        document.getElementById("modalAlertaIconeBi").className = "bi " + icone;
+
+        document.getElementById("modalAlertaTitulo").textContent = titulo;
+
+        const badgeEl = document.getElementById("modalAlertaBadge");
+        badgeEl.textContent = badge;
+        badgeEl.className = "badge rounded-pill notif-badge--" + cor;
+
+        const detalhesBox = document.getElementById("modalAlertaDetalhes");
+        detalhesBox.innerHTML = "";
+        detalhes.forEach(function (d) {
+            const row = document.createElement("div");
+            row.className = "notif-modal-row";
+            row.innerHTML = "<span class='text-muted'>" + d.label + "</span><span class='fw-semibold text-dark'>" + d.valor + "</span>";
+            detalhesBox.appendChild(row);
+        });
+
+        const ajustarBtn = document.getElementById("modalAlertaAjustarLink");
+        if (produtoUrl) {
+            ajustarBtn.href = produtoUrl;
+            ajustarBtn.classList.remove("d-none");
+        } else {
+            ajustarBtn.classList.add("d-none");
+        }
+    });
+});
+</script>
+
+{% endblock %}

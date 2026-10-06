@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO E AÇÕES RÁPIDAS -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="h4 fw-bold mb-1 text-dark">Estoque de Produtos</h2>
+            <p class="text-muted small mb-0">Gerencie a lista de produtos, quantidades e pedidos de movimentação.</p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-secondary" title="Atualizar página">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span class="d-none d-sm-inline ms-1">Atualizar</span>
+            </a>
+
+            {% if tem_permissao('pedido_entrada') %}
+            <a href="{{ url_for('novo_pedido_entrada') }}" class="btn btn-outline-success">
+                <i class="bi bi-box-arrow-in-down me-1"></i> Pedido Entrada
+            </a>
+            {% endif %}
+
+            {% if tem_permissao('pedido_saida') %}
+            <a href="{{ url_for('novo_pedido_saida') }}" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-up me-1"></i> Pedido Saída
+            </a>
+            {% endif %}
+
+            {% if tem_permissao('produtos_criar') %}
+            <a href="{{ url_for('novo_produto') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Novo Produto
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MENSAGENS FLASH -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'sucesso' else 'danger' }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                    <i class="bi bi-{{ 'check-circle-fill' if category == 'sucesso' else 'exclamation-triangle-fill' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- CARD DA TABELA -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+
+            {% if produtos %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light border-bottom">
+                        <tr>
+                            <th class="ps-4">Nome</th>
+                            <th>Descrição</th>
+                            <th>Marca / Categoria</th>
+                            <th>Unid. Medida</th>
+                            <th>Qtd. Estoque</th>
+                            <th>Temp. Baixa</th>
+                            {% if tem_permissao('produtos_editar') or tem_permissao('produtos_excluir') %}
+                            <th class="text-end pe-4">Ações</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr class="produto-linha"
+                            style="cursor: pointer;"
+                            data-nome="{{ produto.nome }}"
+                            data-descricao="{{ produto.especificacao }}"
+                            data-categoria="{{ produto.marca }}"
+                            data-unidade="{{ produto.unidade_medida }}"
+                            data-quantidade="{{ produto.quantidade }}"
+                            data-temperatura="{{ 'Sim' if produto.precisa_temperatura_baixa else 'Não' }}"
+                            data-validade="{{ produto.data_de_validade }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalDetalhesProduto">
+
+                            <td class="ps-4 fw-semibold text-dark">
+                                {{ produto.nome }}
+                            </td>
+
+                            <td class="text-secondary small text-truncate" style="max-width: 220px;">
+                                {{ produto.especificacao or '-' }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-light text-dark border fw-normal">{{ produto.marca or 'N/A' }}</span>
+                            </td>
+
+                            <td class="text-secondary small">
+                                {{ produto.unidade_medida or '-' }}
+                            </td>
+
+                            <td>
+                                <span class="fw-bold">{{ produto.quantidade }}</span>
+                            </td>
+
+                            <td>
+                                {% if produto.precisa_temperatura_baixa %}
+                                <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                    <i class="bi bi-snow me-1"></i>Sim
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Não</span>
+                                {% endif %}
+                            </td>
+
+                            {% if tem_permissao('produtos_editar') or tem_permissao('produtos_excluir') %}
+                            <td class="text-end pe-4" onclick="event.stopPropagation();">
+                                {% if tem_permissao('produtos_editar') %}
+                                <a href="{{ url_for('buscar_produto', id=produto.id) }}"
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                    Editar
+                                </a>
+                                {% endif %}
+
+                                {% if tem_permissao('produtos_excluir') %}
+                                <form action="{{ url_for('excluir_produto', id=produto.id) }}" 
+                                      method="POST" 
+                                      class="d-inline" 
+                                      onsubmit="return confirm('Tem certeza que deseja excluir este produto?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                        Excluir
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+            <!-- ESTADO VAZIO -->
+            <div class="text-center py-5">
+                <i class="bi bi-box-seam display-4 text-muted opacity-50"></i>
+                <h5 class="fw-bold text-secondary mt-3">Nenhum produto cadastrado</h5>
+                <p class="text-muted small mb-3">Comece adicionando seu primeiro produto ao inventário.</p>
+                {% if tem_permissao('produtos_criar') %}
+                <a href="{{ url_for('novo_produto') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Cadastrar Produto
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL DE DETALHES DO PRODUTO -->
+<div class="modal fade" id="modalDetalhesProduto" tabindex="-1" aria-labelledby="modalDetalhesProdutoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-dark fs-6" id="modalDetalhesProdutoLabel">
+                    <i class="bi bi-box-seam me-2 text-primary"></i>Detalhes do Produto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Nome</span>
+                        <span id="modal-nome" class="fw-bold text-dark"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Descrição</span>
+                        <span id="modal-descricao" class="text-secondary text-end" style="max-width: 60%;"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Categoria / Marca</span>
+                        <span id="modal-categoria" class="badge bg-light text-dark border"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Unidade de medida</span>
+                        <span id="modal-unidade" class="text-dark"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Quantidade em estoque</span>
+                        <span id="modal-quantidade" class="fw-bold text-primary fs-6"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Temperatura baixa</span>
+                        <span id="modal-temperatura"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between py-3 px-4">
+                        <span class="text-muted small fw-semibold">Data de validade</span>
+                        <span id="modal-validade" class="text-dark"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const linhas = document.querySelectorAll('.produto-linha');
+
+        linhas.forEach(function (linha) {
+            linha.addEventListener('click', function () {
+                document.getElementById('modal-nome').textContent = linha.dataset.nome || '-';
+                document.getElementById('modal-descricao').textContent = linha.dataset.descricao || '-';
+                document.getElementById('modal-categoria').textContent = linha.dataset.categoria || '-';
+                document.getElementById('modal-unidade').textContent = linha.dataset.unidade || '-';
+                document.getElementById('modal-quantidade').textContent = linha.dataset.quantidade || '0';
+                document.getElementById('modal-temperatura').textContent = linha.dataset.temperatura || 'Não';
+                document.getElementById('modal-validade').textContent = linha.dataset.validade || '-';
+            });
+        });
+    });
+</script>
+
+{% endblock %}
