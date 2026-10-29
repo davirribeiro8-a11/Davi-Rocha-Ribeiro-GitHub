@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Login | FitLife{% endblock %}{% block content %}
+<section class="login">
+    <p class="eyebrow">SISTEMA DE GESTÃO</p>
+    <h1>Academia FitLife</h1>
+    <p class="muted">Entre para administrar alunos, professores e atividades.</p>
+    <form method="post" class="fields"><label>Usuário<input name="usuario" required
+                autocomplete="username"></label><label>Senha<input type="password" name="senha" required
+                autocomplete="current-password"></label><button class="btn primary">Entrar</button></form>
+</section>{% endblock %}

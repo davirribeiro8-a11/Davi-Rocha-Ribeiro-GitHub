@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}Painel | FitLife{% endblock %}{% block content %}
+<div class="heading">
+    <div>
+        <p class="eyebrow">VISÃO GERAL</p>
+        <h1>Olá, {{ session.get('nome','usuário') }}</h1>
+        <p class="muted">Resumo da operação da academia.</p>
+    </div><a class="btn primary" href="{{ url_for('atividade_form') }}">Nova atividade</a>
+</div>
+<div class="stats">{% for key,label,link in [('alunos','Alunos cadastrados','alunos'),('professores','Professores
+    cadastrados','professores'),('atividades','Atividades registradas','atividades')] %}<article><span>{{ label
+            }}</span><strong>{{ totals[key] }}</strong><a href="{{ url_for(link) }}">Ver registros</a></article>{%
+    endfor %}</div>
+<section class="panel">
+    <h2>Atividades</h2>{% if rows %}<div class="tablewrap">
+        <table>
+            <tr>
+                <th>Início</th>
+                <th>Aluno</th>
+                <th>Professor</th>
+                <th>Modalidade</th>
+            </tr>{% for r in rows %}<tr>
+                <td>{{ r.data_inicio.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.aluno }}</td>
+                <td>{{ r.professor }}</td>
+                <td>{{ r.modalidade }}</td>
+            </tr>{% endfor %}
+        </table>
+    </div>{% else %}<p>Nenhuma atividade cadastrada.</p>{% endif %}
+</section>{% endblock %}

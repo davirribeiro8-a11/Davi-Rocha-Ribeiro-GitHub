@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Atividade | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar atividade'
+    if row else 'Nova atividade' }}</h1>{% if not alunos or not professores %}<div class="alert warning">Cadastre pelo
+    menos um aluno e um professor antes.</div>{% endif %}<section class="panel narrow">
+    <form method="post" class="fields"><label>Aluno<select name="id_aluno" required>{% for a in alunos %}<option
+                    value="{{ a.id_aluno }}" {% if row and row.id_aluno==a.id_aluno %}selected{% endif %}>{{ a.nome }}
+                </option>{% endfor %}</select></label><label>Professor<select name="id_professor" required>{% for p in
+                professores %}<option value="{{ p.id_professor }}" {% if row and row.id_professor==p.id_professor
+                    %}selected{% endif %}>{{ p.nome }} — {{ p.especialidade }}</option>{% endfor
+                %}</select></label><label>Modalidade<select name="modalidade">{% for m in modalidades %}<option {% if
+                    row and row.modalidade==m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
+        <div class="two"><label>Mensalidade<input type="number" name="valor_mensal" min="0" step=".01" required
+                    value="{{ '%.2f'|format(row.valor_mensal|float) if row else '' }}"></label><label>Data de
+                início<input type="date" name="data_inicio" required
+                    value="{{ row.data_inicio.isoformat() if row else '' }}"></label></div>
+        <div class="actions"><a class="btn secondary" href="{{ url_for('atividades') }}">Cancelar</a><button
+                class="btn primary" {% if not alunos or not professores %}disabled{% endif %}>Salvar</button></div>
+    </form>
+</section>{% endblock %}

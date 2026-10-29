@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Painel | FitLife{% endblock %}{% block content %}
+<div class="heading"><div><p class="eyebrow">VISÃO GERAL</p><h1>Olá, {{ session.get('nome','usuário') }}</h1><p class="muted">Gerencie alunos, planos de treinamento e agendamentos.</p></div><a class="btn primary" href="{{ url_for('agendamento_form') }}">Novo agendamento</a></div>
+<div class="stats">
+{% for key,label,link in [('alunos','Alunos cadastrados','alunos'),('planos','Planos de treinamento','planos'),('agendamentos','Agendamentos','agendamentos')] %}
+<article><span>{{ label }}</span><strong>{{ totals[key] }}</strong><a href="{{ url_for(link) }}">Ver registros</a></article>
+{% endfor %}
+</div>
+<section class="panel"><h2>Próximos agendamentos</h2>{% if rows %}<div class="tablewrap"><table><tr><th>Data e hora</th><th>Aluno</th><th>Plano</th><th>Professor</th></tr>
+{% for r in rows %}<tr><td>{{ r.data_agendamento.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ r.aluno }}</td><td>{{ r.plano }}</td><td>{{ r.professor or 'Não definido' }}</td></tr>{% endfor %}</table></div>{% else %}<p>Nenhum agendamento cadastrado.</p>{% endif %}</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}Alunos | FitLife{% endblock %}{% block content %}
+<div class="heading">
+    <div>
+        <p class="eyebrow">CADASTROS</p>
+        <h1>Alunos</h1>
+    </div><a class="btn primary" href="{{ url_for('aluno_form') }}">Novo aluno</a>
+</div>
+<form class="search" method="get"><input name="q" value="{{ term }}" placeholder="Buscar pelo nome"><button
+        class="btn secondary">Buscar</button></form>
+<section class="panel">{% if rows %}<div class="tablewrap">
+        <table>
+            <tr>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Telefone</th>
+                <th>Cidade</th>
+                <th>Ações</th>
+            </tr>{% for r in rows %}<tr>
+                <td>{{ r.nome }}</td>
+                <td>{{ r.idade }}</td>
+                <td>{{ r.telefone or '—' }}</td>
+                <td>{{ r.cidade or '—' }}</td>
+                <td class="actions"><a href="{{ url_for('aluno_form',id=r.id_aluno) }}">Editar</a>
+                    <form method="post" action="{{ url_for('aluno_delete',id=r.id_aluno) }}"
+                        onsubmit="return confirm('Excluir aluno?')"><button class="danger-link">Excluir</button></form>
+                </td>
+            </tr>{% endfor %}
+        </table>
+    </div>{% else %}<p>Nenhum aluno encontrado.</p>{% endif %}</section>{% endblock %}

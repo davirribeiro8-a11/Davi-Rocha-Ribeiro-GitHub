@@ -1,0 +1,294 @@
+{% set cabecalho = pedido.cabecalho if pedido else None %}
+{% set itens = pedido.itens if pedido else [] %}
+
+{% extends "base.html" %}
+
+{% block title %}
+Novo Pedido de Entrada - Sistema de Estoque
+{% endblock %}
+
+{% block page_title %}
+Novo Pedido de Entrada
+{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">Cabeçalho do pedido</h5>
+            <small class="text-muted">
+                Informe os dados gerais da entrada
+            </small>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label for="numero_documento" class="form-label">
+                        Número do Documento
+                    </label>
+
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="numero_documento" 
+                            name="numero_documento"
+                            value="{{ cabecalho.numero_documento if cabecalho else '' }}"
+                            required
+                        >
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="fornecedor" class="form-label">
+                        Fornecedor
+                    </label>
+
+                   <input 
+                        type="text" 
+                        class="form-control" 
+                        id="fornecedor" 
+                        name="fornecedor"
+                        value="{{ cabecalho.fornecedor if cabecalho else '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="data_entrada" class="form-label">
+                        Data de Entrada
+                    </label>
+
+                    <input 
+                        type="date" 
+                        class="form-control" 
+                        id="data_entrada" 
+                        name="data_entrada"
+                        value="{{ cabecalho.data_entrada if cabecalho else '' }}"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+                <label for="observacao" class="form-label">
+                    Observação
+                </label>
+
+                <textarea 
+                    class="form-control" 
+                    id="observacao" 
+                    name="observacao" 
+                    rows="3"
+                >{{ cabecalho.observacao if cabecalho else '' }}</textarea>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="mb-0">Itens do pedido</h5>
+                <small class="text-muted">
+                    Adicione um ou mais produtos ao pedido de entrada
+                </small>
+            </div>
+
+            <button 
+                type="button" 
+                class="btn btn-success" 
+                onclick="adicionarItemEntrada()"
+            >
+                Adicionar Item
+            </button>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered align-middle" id="tabelaItensEntrada">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 30%;">Produto</th>
+                            <th style="width: 25%;">Localização</th>
+                            <th style="width: 15%;">Quantidade</th>
+                            <th style="width: 15%;">Valor Unitário</th>
+                            <th style="width: 10%;">Total</th>
+                            <th style="width: 5%;" class="text-center">Ação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="corpoItensEntrada">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="alert alert-info">
+                Clique em <strong>Adicionar Item</strong> para incluir produtos no pedido.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+
+        <a href="{{ url_for('listar_pedidos_entrada') }}" class="btn btn-secondary">
+            Voltar
+        </a>
+
+        <button type="submit" class="btn btn-primary">
+            Salvar Pedido de Entrada
+        </button>
+
+    </div>
+
+</form>
+
+<template id="templateItemEntrada">
+    <tr>
+        <td>
+            <select name="id_produto[]" class="form-select" required>
+                <option value="">Selecione</option>
+
+                {% for produto in produtos %}
+                    <option value="{{ produto.id_produto }}">
+                        {{ produto.codigo }} - {{ produto.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td>
+            <select name="id_localizacao[]" class="form-select" required>
+                <option value="">Selecione</option>
+
+                {% for localizacao in localizacoes %}
+                    <option value="{{ localizacao.id_localizacao }}">
+                        {{ localizacao.nome }} - {{ localizacao.setor }}
+                    </option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td>
+            <input 
+                type="number" 
+                name="quantidade[]" 
+                class="form-control quantidade-entrada" 
+                step="0.01" 
+                min="0.01"
+                required
+                oninput="calcularTotalEntrada(this)"
+            >
+        </td>
+
+        <td>
+            <input 
+                type="number" 
+                name="valor_unitario[]" 
+                class="form-control valor-unitario-entrada" 
+                step="0.01" 
+                min="0"
+                value="0"
+                oninput="calcularTotalEntrada(this)"
+            >
+        </td>
+
+        <td>
+            <input 
+                type="text" 
+                class="form-control total-entrada" 
+                value="0.00"
+                readonly
+            >
+        </td>
+
+        <td class="text-center">
+            <button 
+                type="button" 
+                class="btn btn-sm btn-danger" 
+                onclick="removerLinha(this)"
+            >
+                X
+            </button>
+        </td>
+    </tr>
+</template>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    function adicionarItemEntrada(produtoId = "", localizacaoId = "", quantidade = "", valorUnitario = "0") {
+        const template = document.getElementById("templateItemEntrada");
+        const corpo = document.getElementById("corpoItensEntrada");
+
+        const novaLinha = template.content.cloneNode(true);
+
+        corpo.appendChild(novaLinha);
+
+        const linhas = corpo.querySelectorAll("tr");
+        const linha = linhas[linhas.length - 1];
+
+        linha.querySelector('select[name="id_produto[]"]').value = produtoId;
+        linha.querySelector('select[name="id_localizacao[]"]').value = localizacaoId;
+        linha.querySelector('input[name="quantidade[]"]').value = quantidade;
+        linha.querySelector('input[name="valor_unitario[]"]').value = valorUnitario;
+
+        calcularTotalEntrada(linha.querySelector('input[name="quantidade[]"]'));
+    }
+
+    function removerLinha(botao) {
+        const linha = botao.closest("tr");
+        linha.remove();
+    }
+
+    function calcularTotalEntrada(elemento) {
+        const linha = elemento.closest("tr");
+
+        const quantidade = parseFloat(
+            linha.querySelector(".quantidade-entrada").value
+        ) || 0;
+
+        const valorUnitario = parseFloat(
+            linha.querySelector(".valor-unitario-entrada").value
+        ) || 0;
+
+        const total = quantidade * valorUnitario;
+
+        linha.querySelector(".total-entrada").value = total.toFixed(2);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        {% if itens %}
+            {% for item in itens %}
+                adicionarItemEntrada(
+                    "{{ item.id_produto }}",
+                    "{{ item.id_localizacao }}",
+                    "{{ item.quantidade }}",
+                    "{{ item.valor_unitario }}"
+                );
+            {% endfor %}
+        {% else %}
+            adicionarItemEntrada();
+        {% endif %}
+    });
+</script>
+
+{% endblock %}

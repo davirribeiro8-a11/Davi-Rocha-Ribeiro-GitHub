@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Professor | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar professor'
+    if row else 'Novo professor' }}</h1>
+<section class="panel narrow">
+    <form method="post" class="fields"><label>Nome<input name="nome" required
+                value="{{ row.nome if row else '' }}"></label><label>Telefone<input name="telefone"
+                value="{{ row.telefone if row else '' }}"></label><label>Especialidade<select name="especialidade">{%
+                for m in modalidades %}<option {% if row and row.especialidade==m %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}</select></label>
+        <div class="actions"><a class="btn secondary" href="{{ url_for('professores') }}">Cancelar</a><button
+                class="btn primary">Salvar</button></div>
+    </form>
+</section>{% endblock %}

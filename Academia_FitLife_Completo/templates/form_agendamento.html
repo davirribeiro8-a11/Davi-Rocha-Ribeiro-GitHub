@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Agendamento | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar agendamento' if row else 'Novo agendamento' }}</h1>
+{% if not alunos or not planos %}<div class="alert warning">Cadastre um aluno e um plano para criar agendamentos.</div>{% endif %}
+<section class="panel narrow"><form method="post" class="fields">
+<label>Aluno<select name="id_aluno" required>{% for a in alunos %}<option value="{{ a.id_aluno }}" {% if row and row.id_aluno==a.id_aluno %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></label>
+<label>Plano<select name="id_plano" required>{% for p in planos %}<option value="{{ p.id_plano }}" {% if row and row.id_plano==p.id_plano %}selected{% endif %}>{{ p.aluno }} — {{ p.nome_plano }}</option>{% endfor %}</select></label>
+<label>Professor (opcional)<select name="id_professor"><option value="">Não definido</option>{% for p in professores %}<option value="{{ p.id_professor }}" {% if row and row.id_professor==p.id_professor %}selected{% endif %}>{{ p.nome }}</option>{% endfor %}</select></label>
+<label>Data e hora<input type="datetime-local" name="data_agendamento" required value="{{ row.data_agendamento.strftime('%Y-%m-%dT%H:%M') if row else '' }}"></label>
+<label>Observação<input name="observacao" maxlength="255" value="{{ row.observacao if row else '' }}"></label>
+<div class="hint">O aluno selecionado deve ser o mesmo associado ao plano escolhido. Essa regra é validada no servidor.</div>
+<div class="actions"><a class="btn secondary" href="{{ url_for('agendamentos') }}">Cancelar</a><button class="btn primary" {% if not alunos or not planos %}disabled{% endif %}>Salvar</button></div></form></section>{% endblock %}

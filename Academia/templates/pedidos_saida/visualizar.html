@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}
+Visualizar Pedido de Saída - Sistema de Estoque
+{% endblock %}
+
+{% block page_title %}
+Visualizar Pedido de Saída
+{% endblock %}
+
+{% block content %}
+
+{% set cabecalho = pedido.cabecalho %}
+{% set itens = pedido.itens %}
+
+<div class="card mb-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0">Pedido de Saída #{{ cabecalho.id_pedido_saida }}</h5>
+            <small class="text-muted">
+                Dados gerais do pedido
+            </small>
+        </div>
+
+        <a href="{{ url_for('listar_pedidos_saida') }}" class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+
+            <div class="col-md-4 mb-3">
+                <strong>Documento:</strong><br>
+                {{ cabecalho.numero_documento }}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <strong>Solicitante:</strong><br>
+                {{ cabecalho.solicitante }}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <strong>Data de Saída:</strong><br>
+                {{ cabecalho.data_saida }}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <strong>Usuário:</strong><br>
+                {{ cabecalho.usuario }}
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <strong>Status:</strong><br>
+
+                {% if cabecalho.status == 'finalizado' %}
+                    <span class="badge bg-success">Finalizado</span>
+                {% elif cabecalho.status == 'cancelado' %}
+                    <span class="badge bg-danger">Cancelado</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Aberto</span>
+                {% endif %}
+            </div>
+
+            <div class="col-md-12 mb-3">
+                <strong>Observação:</strong><br>
+                {{ cabecalho.observacao or 'Sem observações' }}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="card-header">
+        <h5 class="mb-0">Itens do pedido</h5>
+    </div>
+
+    <div class="card-body">
+
+        {% if itens %}
+
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Produto</th>
+                            <th>Código</th>
+                            <th>Localização</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in itens %}
+
+                            <tr>
+                                <td>
+                                    <strong>{{ item.produto }}</strong>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ item.codigo }}
+                                    </span>
+                                </td>
+
+                                <td>{{ item.localizacao }}</td>
+
+                                <td>{{ item.quantidade }}</td>
+                            </tr>
+
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info mb-0">
+                Este pedido não possui itens.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

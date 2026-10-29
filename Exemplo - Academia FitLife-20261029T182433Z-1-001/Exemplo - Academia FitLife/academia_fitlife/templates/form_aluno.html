@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Aluno | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar aluno' if row
+    else 'Novo aluno' }}</h1>
+<section class="panel narrow">
+    <form method="post" class="fields"><label>Nome<input name="nome" required maxlength="100"
+                value="{{ row.nome if row else '' }}"></label>
+        <div class="two"><label>Idade<input type="number" name="idade" min="0" required
+                    value="{{ row.idade if row else '' }}"></label><label>Telefone<input name="telefone"
+                    value="{{ row.telefone if row else '' }}"></label></div><label>Cidade<input name="cidade"
+                value="{{ row.cidade if row else '' }}"></label>
+        <div class="actions"><a class="btn secondary" href="{{ url_for('alunos') }}">Cancelar</a><button
+                class="btn primary">Salvar</button></div>
+    </form>
+</section>{% endblock %}

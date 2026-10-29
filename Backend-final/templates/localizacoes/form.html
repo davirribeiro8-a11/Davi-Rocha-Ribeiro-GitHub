@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if localizacao %}
+Editar Localização - Sistema de Estoque
+{% else %}
+Nova Localização - Sistema de Estoque
+{% endif %}
+{% endblock %}
+
+{% block page_title %}
+{% if localizacao %}
+Editar Localização
+{% else %}
+Nova Localização
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+
+        {% if localizacao %}
+            <h5 class="mb-0">Editar localização</h5>
+            <small class="text-muted">
+                Altere as informações do local de armazenamento
+            </small>
+        {% else %}
+            <h5 class="mb-0">Cadastrar nova localização</h5>
+            <small class="text-muted">
+                Preencha os dados do local de armazenamento
+            </small>
+        {% endif %}
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">
+                        Nome da Localização
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="nome" 
+                        name="nome"
+                        value="{{ localizacao.nome if localizacao else '' }}"
+                        placeholder="Ex: Almoxarifado Principal"
+                        required
+                    >
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="setor" class="form-label">
+                        Setor
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="setor" 
+                        name="setor"
+                        value="{{ localizacao.setor if localizacao else '' }}"
+                        placeholder="Ex: Estoque"
+                    >
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="corredor" class="form-label">
+                        Corredor
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="corredor" 
+                        name="corredor"
+                        value="{{ localizacao.corredor if localizacao else '' }}"
+                        placeholder="Ex: A"
+                    >
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="prateleira" class="form-label">
+                        Prateleira
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="prateleira" 
+                        name="prateleira"
+                        value="{{ localizacao.prateleira if localizacao else '' }}"
+                        placeholder="Ex: P1"
+                    >
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+                <label for="observacao" class="form-label">
+                    Observação
+                </label>
+
+                <textarea 
+                    class="form-control" 
+                    id="observacao" 
+                    name="observacao" 
+                    rows="3"
+                    placeholder="Informações adicionais sobre a localização"
+                >{{ localizacao.observacao if localizacao else '' }}</textarea>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between">
+
+                <a href="{{ url_for('listar_localizacoes') }}" class="btn btn-secondary">
+                    Voltar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    {% if localizacao %}
+                        Salvar Alterações
+                    {% else %}
+                        Cadastrar Localização
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

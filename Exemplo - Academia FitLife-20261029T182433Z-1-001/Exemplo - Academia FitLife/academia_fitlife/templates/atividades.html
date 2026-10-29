@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block title %}Atividades | FitLife{% endblock %}{% block content %}
+<div class="heading">
+    <div>
+        <p class="eyebrow">MATRÍCULAS</p>
+        <h1>Atividades</h1>
+        <p class="muted">Cada registro associa aluno, professor e modalidade.</p>
+    </div><a class="btn primary" href="{{ url_for('atividade_form') }}">Nova atividade</a>
+</div>
+<section class="panel">{% if rows %}<div class="tablewrap">
+        <table>
+            <tr>
+                <th>Início</th>
+                <th>Aluno</th>
+                <th>Professor</th>
+                <th>Modalidade</th>
+                <th>Mensalidade</th>
+                <th>Ações</th>
+            </tr>{% for r in rows %}<tr>
+                <td>{{ r.data_inicio.strftime('%d/%m/%Y') }}</td>
+                <td>{{ r.aluno }}<small>{{ r.idade }} anos</small></td>
+                <td>{{ r.professor }}<small>{{ r.especialidade }}</small></td>
+                <td>{{ r.modalidade }}</td>
+                <td>R$ {{ '%.2f'|format(r.valor_mensal|float) }}</td>
+                <td class="actions"><a href="{{ url_for('atividade_form',id=r.id_atividade) }}">Editar</a>
+                    <form method="post" action="{{ url_for('atividade_delete',id=r.id_atividade) }}"
+                        onsubmit="return confirm('Excluir atividade?')"><button class="danger-link">Excluir</button>
+                    </form>
+                </td>
+            </tr>{% endfor %}
+        </table>
+    </div>{% else %}<p>Nenhuma atividade cadastrada.</p>{% endif %}</section>{% endblock %}

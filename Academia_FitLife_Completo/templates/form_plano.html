@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Plano | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar plano' if row else 'Novo plano' }}</h1>
+{% if not alunos %}<div class="alert warning">Cadastre um aluno antes de criar um plano.</div>{% endif %}
+<section class="panel narrow"><form method="post" class="fields">
+<label>Aluno<select name="id_aluno" required>{% for a in alunos %}<option value="{{ a.id_aluno }}" {% if row and row.id_aluno==a.id_aluno %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></label>
+<label>Nome do plano<input name="nome_plano" required maxlength="100" value="{{ row.nome_plano if row else '' }}" placeholder="Ex.: Musculação 3x por semana"></label>
+<label>Descrição<textarea name="descricao" rows="3">{{ row.descricao if row else '' }}</textarea></label>
+<label>Modalidade<select name="modalidade" required>{% for m in modalidades %}<option {% if row and row.modalidade==m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select></label>
+<div class="two"><label>Mensalidade (R$)<input type="number" name="valor_mensal" min="0" step=".01" required value="{{ '%.2f'|format(row.valor_mensal|float) if row else '0.00' }}"></label><label>Data de início<input type="date" name="data_inicio" required value="{{ row.data_inicio.isoformat() if row else '' }}"></label></div>
+<div class="actions"><a class="btn secondary" href="{{ url_for('planos') }}">Cancelar</a><button class="btn primary" {% if not alunos %}disabled{% endif %}>Salvar</button></div></form></section>{% endblock %}

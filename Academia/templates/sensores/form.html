@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if sensor %}
+Editar Sensor - Sistema de Estoque
+{% else %}
+Novo Sensor - Sistema de Estoque
+{% endif %}
+{% endblock %}
+
+{% block page_title %}
+{% if sensor %}
+Editar Sensor
+{% else %}
+Novo Sensor
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+
+        {% if sensor %}
+            <h5 class="mb-0">Editar sensor</h5>
+            <small class="text-muted">
+                Altere as informações do sensor selecionado
+            </small>
+        {% else %}
+            <h5 class="mb-0">Cadastrar novo sensor</h5>
+            <small class="text-muted">
+                Preencha os dados do sensor instalado
+            </small>
+        {% endif %}
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">
+                        Nome do Sensor
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="nome" 
+                        name="nome"
+                        value="{{ sensor.nome if sensor else '' }}"
+                        placeholder="Ex: Sensor Temperatura Almoxarifado"
+                        required
+                    >
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="tipo_sensor" class="form-label">
+                        Tipo de Sensor
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="tipo_sensor" 
+                        name="tipo_sensor"
+                        required
+                    >
+                        <option value="">Selecione</option>
+
+                        <option value="temperatura"
+                            {% if sensor and sensor.tipo_sensor == 'temperatura' %}selected{% endif %}
+                        >
+                            Temperatura
+                        </option>
+
+                        <option value="umidade"
+                            {% if sensor and sensor.tipo_sensor == 'umidade' %}selected{% endif %}
+                        >
+                            Umidade
+                        </option>
+
+                        <option value="peso"
+                            {% if sensor and sensor.tipo_sensor == 'peso' %}selected{% endif %}
+                        >
+                            Peso
+                        </option>
+
+                        <option value="presenca"
+                            {% if sensor and sensor.tipo_sensor == 'presenca' %}selected{% endif %}
+                        >
+                            Presença
+                        </option>
+
+                        <option value="luminosidade"
+                            {% if sensor and sensor.tipo_sensor == 'luminosidade' %}selected{% endif %}
+                        >
+                            Luminosidade
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="codigo_sensor" class="form-label">
+                        Código do Sensor
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="codigo_sensor" 
+                        name="codigo_sensor"
+                        value="{{ sensor.codigo_sensor if sensor else '' }}"
+                        placeholder="Ex: TEMP001"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label for="id_localizacao" class="form-label">
+                        Localização
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="id_localizacao" 
+                        name="id_localizacao"
+                        required
+                    >
+                        <option value="">Selecione</option>
+
+                        {% for localizacao in localizacoes %}
+                            <option 
+                                value="{{ localizacao.id_localizacao }}"
+                                {% if sensor and sensor.id_localizacao == localizacao.id_localizacao %}selected{% endif %}
+                            >
+                                {{ localizacao.nome }} - {{ localizacao.setor }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="id_produto" class="form-label">
+                        Produto Monitorado
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="id_produto" 
+                        name="id_produto"
+                    >
+                        <option value="">Não vincular a produto</option>
+
+                        {% for produto in produtos %}
+                            <option 
+                                value="{{ produto.id_produto }}"
+                                {% if sensor and sensor.id_produto == produto.id_produto %}selected{% endif %}
+                            >
+                                {{ produto.codigo }} - {{ produto.nome }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+
+                    <small class="text-muted">
+                        Use somente se o sensor estiver associado a um produto específico.
+                    </small>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="status" class="form-label">
+                        Status
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="status" 
+                        name="status"
+                    >
+                        <option value="ativo"
+                            {% if not sensor or sensor.status == 'ativo' %}selected{% endif %}
+                        >
+                            Ativo
+                        </option>
+
+                        <option value="inativo"
+                            {% if sensor and sensor.status == 'inativo' %}selected{% endif %}
+                        >
+                            Inativo
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between">
+
+                <a href="{{ url_for('listar_sensores') }}" class="btn btn-secondary">
+                    Voltar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    {% if sensor %}
+                        Salvar Alterações
+                    {% else %}
+                        Cadastrar Sensor
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

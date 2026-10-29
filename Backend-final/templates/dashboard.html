@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Sistema de Estoque
+{% endblock %}
+
+{% block page_title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Produtos</h6>
+                <h3>{{ total_produtos }}</h3>
+                <p class="text-muted mb-0">Produtos cadastrados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Estoque</h6>
+                <h3>{{ total_estoque }}</h3>
+                <p class="text-muted mb-0">Produtos com saldo</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Entradas</h6>
+                <h3>{{ total_entradas }}</h3>
+                <p class="text-muted mb-0">Pedidos de entrada</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Saídas</h6>
+                <h3>{{ total_saidas }}</h3>
+                <p class="text-muted mb-0">Pedidos de saída</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Usuários</h6>
+                <h3>{{ total_usuarios }}</h3>
+                <p class="text-muted mb-0">Usuários cadastrados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+                <h6 class="card-title">Sensores</h6>
+                <h3>{{ total_sensores }}</h3>
+                <p class="text-muted mb-0">Sensores cadastrados</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-8 mb-3">
+        <div class="card">
+            <div class="card-header">
+                Visão geral do sistema
+            </div>
+
+            <div class="card-body">
+                <p>
+                    Bem-vindo ao sistema de controle de estoque.
+                </p>
+
+                <p>
+                    Utilize o menu lateral para acessar os cadastros, consultar o estoque,
+                    registrar pedidos de entrada, pedidos de saída e acompanhar sensores.
+                </p>
+
+                <hr>
+
+                <h6>Fluxo principal do sistema:</h6>
+
+                <ol>
+                    <li>Cadastrar produtos.</li>
+                    <li>Cadastrar localizações.</li>
+                    <li>Registrar pedidos de entrada.</li>
+                    <li>Consultar saldo em estoque.</li>
+                    <li>Registrar pedidos de saída.</li>
+                    <li>Acompanhar sensores cadastrados.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card">
+            <div class="card-header">
+                Usuário logado
+            </div>
+
+            <div class="card-body">
+
+                <p class="mb-1">
+                    <strong>Nome:</strong>
+                    {{ session.get('usuario_nome') }}
+                </p>
+
+                <p class="mb-1">
+                    <strong>Perfil:</strong>
+                    {{ session.get('usuario_perfil') }}
+                </p>
+
+                <p class="text-muted mt-3">
+                    Sessão ativa no sistema.
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

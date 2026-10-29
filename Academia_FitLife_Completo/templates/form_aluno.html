@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}Aluno | FitLife{% endblock %}{% block content %}<h1>{{ 'Editar aluno' if row else 'Novo aluno' }}</h1>
+<section class="panel narrow"><form method="post" class="fields">
+<label>Nome completo<input name="nome" required maxlength="100" value="{{ row.nome if row else '' }}"></label>
+<label>CPF {% if row %}<small>Deixe em branco para manter o CPF atual.</small>{% endif %}<input name="cpf" inputmode="numeric" pattern="[0-9.-]{11,14}" {% if not row %}required{% endif %} placeholder="000.000.000-00"></label>
+<div class="two"><label>Idade<input type="number" name="idade" min="0" max="120" required value="{{ row.idade if row else '' }}"></label><label>Telefone<input name="telefone" maxlength="20" value="{{ row.telefone if row else '' }}"></label></div>
+<label>Cidade<input name="cidade" maxlength="80" value="{{ row.cidade if row else '' }}"></label>
+<p class="hint">O CPF é criptografado antes de ser salvo no banco. A chave de criptografia fica em instance/fernet.key; mantenha-a protegida e faça backup seguro.</p>
+<div class="actions"><a class="btn secondary" href="{{ url_for('alunos') }}">Cancelar</a><button class="btn primary">Salvar</button></div></form></section>{% endblock %}

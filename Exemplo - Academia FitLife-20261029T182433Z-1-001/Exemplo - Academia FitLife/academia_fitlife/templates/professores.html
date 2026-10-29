@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block title %}Professores | FitLife{% endblock %}{% block content %}
+<div class="heading">
+    <div>
+        <p class="eyebrow">CADASTROS</p>
+        <h1>Professores</h1>
+    </div><a class="btn primary" href="{{ url_for('professor_form') }}">Novo professor</a>
+</div>
+<section class="panel">{% if rows %}<div class="tablewrap">
+        <table>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Especialidade</th>
+                <th>Ações</th>
+            </tr>{% for r in rows %}<tr>
+                <td>{{ r.nome }}</td>
+                <td>{{ r.telefone or '—' }}</td>
+                <td>{{ r.especialidade }}</td>
+                <td class="actions"><a href="{{ url_for('professor_form',id=r.id_professor) }}">Editar</a>
+                    <form method="post" action="{{ url_for('professor_delete',id=r.id_professor) }}"
+                        onsubmit="return confirm('Excluir professor?')"><button class="danger-link">Excluir</button>
+                    </form>
+                </td>
+            </tr>{% endfor %}
+        </table>
+    </div>{% else %}<p>Nenhum professor cadastrado.</p>{% endif %}</section>{% endblock %}

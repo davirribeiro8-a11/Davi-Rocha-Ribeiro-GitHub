@@ -1,0 +1,32 @@
+
+.table th {
+    white-space: nowrap;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.card-header h5 {
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.85rem;
+}
+
+.modal-content {
+    border-radius: 12px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.logo-sidebar {
+    width: 180px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}

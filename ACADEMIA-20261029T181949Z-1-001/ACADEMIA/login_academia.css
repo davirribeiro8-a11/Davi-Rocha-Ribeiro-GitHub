@@ -1,0 +1,51 @@
+
+
+/*Cor do fundo da tela*/
+body {
+    font-family: Arial;
+    background-color: #f2f2f2;
+    margin: 0;
+}
+
+/*nav la em cima do site escrito academia*/
+nav {
+    background-color: #222;
+    color: white;
+    padding: 15px;
+}
+
+/*as letras da nav como: academia, login, perfil, treinamento*/
+nav a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+}
+
+/*Conatiner com suas cores e tamanhos*/
+.container {
+    background-color: white;
+    width: 300px;
+    margin: 60px auto;
+    padding: 25px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+
+/*caixinhas de dentro do conatiner*/
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

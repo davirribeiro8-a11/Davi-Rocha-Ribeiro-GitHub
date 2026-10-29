@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}
+Sensores - Sistema de Estoque
+{% endblock %}
+
+{% block page_title %}
+Cadastro de Sensores
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <div>
+            <h5 class="mb-0">Sensores cadastrados</h5>
+            <small class="text-muted">
+                Sensores vinculados a localizações ou produtos
+            </small>
+        </div>
+
+        <a href="{{ url_for('novo_sensor') }}" class="btn btn-primary">
+            Novo Sensor
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if sensores %}
+
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Código</th>
+                            <th>ID Localização</th>
+                            <th>ID Produto</th>
+                            <th>Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for sensor in sensores %}
+
+                            <tr>
+                                <td>{{ sensor.id_sensor }}</td>
+
+                                <td>
+                                    <strong>{{ sensor.nome }}</strong>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ sensor.tipo_sensor }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ sensor.codigo_sensor }}
+                                    </span>
+                                </td>
+
+                                <td>{{ sensor.id_localizacao }}</td>
+
+                                <td>
+                                    {% if sensor.id_produto %}
+                                        {{ sensor.id_produto }}
+                                    {% else %}
+                                        <span class="text-muted">Não vinculado</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if sensor.status == 'ativo' %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a 
+                                        href="{{ url_for('editar_sensor', id_sensor=sensor.id_sensor) }}" 
+                                        class="btn btn-sm btn-warning"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalExcluirSensor{{ sensor.id_sensor }}"
+                                    >
+                                        Excluir
+                                    </button>
+
+                                </td>
+                            </tr>
+
+                            <div 
+                                class="modal fade" 
+                                id="modalExcluirSensor{{ sensor.id_sensor }}" 
+                                tabindex="-1"
+                            >
+                                <div class="modal-dialog modal-dialog-centered">
+
+                                    <div class="modal-content">
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                Confirmar exclusão
+                                            </h5>
+
+                                            <button 
+                                                type="button" 
+                                                class="btn-close" 
+                                                data-bs-dismiss="modal"
+                                            ></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <p>
+                                                Deseja realmente excluir o sensor?
+                                            </p>
+
+                                            <p class="mb-0">
+                                                <strong>{{ sensor.nome }}</strong>
+                                            </p>
+
+                                            <small class="text-muted">
+                                                Código: {{ sensor.codigo_sensor }}
+                                            </small>
+
+                                            <div class="alert alert-warning mt-3 mb-0">
+                                                Se este sensor possuir leituras registradas, o banco poderá impedir a exclusão.
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-secondary" 
+                                                data-bs-dismiss="modal"
+                                            >
+                                                Cancelar
+                                            </button>
+
+                                            <a 
+                                                href="{{ url_for('excluir_sensor', id_sensor=sensor.id_sensor) }}" 
+                                                class="btn btn-danger"
+                                            >
+                                                Sim, excluir
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info mb-0">
+                Nenhum sensor cadastrado até o momento.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

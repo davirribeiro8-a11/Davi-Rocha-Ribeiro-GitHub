@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if usuario %}
+Editar Usuário - Sistema de Estoque
+{% else %}
+Novo Usuário - Sistema de Estoque
+{% endif %}
+{% endblock %}
+
+{% block page_title %}
+{% if usuario %}
+Editar Usuário
+{% else %}
+Novo Usuário
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+
+        {% if usuario %}
+            <h5 class="mb-0">Editar usuário</h5>
+            <small class="text-muted">
+                Altere as informações do usuário selecionado
+            </small>
+        {% else %}
+            <h5 class="mb-0">Cadastrar novo usuário</h5>
+            <small class="text-muted">
+                Preencha os dados para cadastrar um novo acesso ao sistema
+            </small>
+        {% endif %}
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">
+                        Nome
+                    </label>
+
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="nome" 
+                        name="nome"
+                        value="{{ usuario.nome if usuario else '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">
+                        E-mail
+                    </label>
+
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email"
+                        value="{{ usuario.email if usuario else '' }}"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label for="senha" class="form-label">
+                        Senha
+                    </label>
+
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="senha" 
+                        name="senha"
+                        {% if not usuario %}required{% endif %}
+                    >
+
+                    {% if usuario %}
+                        <small class="text-muted">
+                            Deixe em branco para manter a senha atual.
+                        </small>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="perfil" class="form-label">
+                        Perfil
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="perfil" 
+                        name="perfil"
+                        required
+                    >
+                        <option value="">Selecione</option>
+
+                        <option value="admin"
+                            {% if usuario and usuario.perfil == 'admin' %}selected{% endif %}
+                        >
+                            Administrador
+                        </option>
+
+                        <option value="almoxarife"
+                            {% if usuario and usuario.perfil == 'almoxarife' %}selected{% endif %}
+                        >
+                            Almoxarife
+                        </option>
+
+                        <option value="operador"
+                            {% if usuario and usuario.perfil == 'operador' %}selected{% endif %}
+                        >
+                            Operador
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="status" class="form-label">
+                        Status
+                    </label>
+
+                    <select 
+                        class="form-select" 
+                        id="status" 
+                        name="status"
+                    >
+                        <option value="ativo"
+                            {% if not usuario or usuario.status == 'ativo' %}selected{% endif %}
+                        >
+                            Ativo
+                        </option>
+
+                        <option value="inativo"
+                            {% if usuario and usuario.status == 'inativo' %}selected{% endif %}
+                        >
+                            Inativo
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between">
+
+                <a href="{{ url_for('listar_usuarios') }}" class="btn btn-secondary">
+                    Voltar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    {% if usuario %}
+                        Salvar Alterações
+                    {% else %}
+                        Cadastrar Usuário
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

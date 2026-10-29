@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}
+Estoque - Sistema de Estoque
+{% endblock %}
+
+{% block page_title %}
+Consulta de Estoque
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">Saldo atual em estoque</h5>
+        <small class="text-muted">
+            Consulta dos produtos disponíveis por localização
+        </small>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if estoque %}
+
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Código</th>
+                            <th>Produto</th>
+                            <th>Localização</th>
+                            <th>Setor</th>
+                            <th>Quantidade Atual</th>
+                            <th>Unidade</th>
+                            <th>Atualizado em</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for item in estoque %}
+
+                            <tr>
+                                <td>{{ item.id_estoque }}</td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ item.codigo }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>{{ item.produto }}</strong>
+                                </td>
+
+                                <td>{{ item.localizacao }}</td>
+
+                                <td>{{ item.setor }}</td>
+
+                                <td>
+                                    {% if item.quantidade_atual|float <= 0 %}
+                                        <span class="badge bg-danger">
+                                            {{ item.quantidade_atual }}
+                                        </span>
+                                    {% elif item.quantidade_atual|float <= 5 %}
+                                        <span class="badge bg-warning text-dark">
+                                            {{ item.quantidade_atual }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success">
+                                            {{ item.quantidade_atual }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ item.unidade_medida }}</td>
+
+                                <td>{{ item.atualizado_em }}</td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info mb-0">
+                Nenhum saldo de estoque encontrado.
+                Registre um pedido de entrada para movimentar o estoque.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
